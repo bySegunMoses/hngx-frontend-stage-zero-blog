@@ -11,28 +11,14 @@ const Navbar = () => {
               <ul>
                 <li>
                   <Link href="/">
-                    <a>About</a>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/">
-                    <a>Services</a>
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/">
                     <a>Work</a>
                   </Link>
                 </li>
                 <li>
-                  <Link href="/">
-                    <a>Blog</a>
-                  </Link>
+                    <a target="_blank" rel="noreferrer" href="https://hng.tech/internship">HNG INTERNSHIP</a>
                 </li>
                 <li>
-                  <Link href="/">
-                    <a>Contact</a>
-                  </Link>
+                    <a target="_blank" rel="noreferrer" href="https://hng.tech/hire">HNG HIRE</a>
                 </li>
               </ul>
             </nav>

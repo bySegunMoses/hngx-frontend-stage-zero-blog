@@ -34,23 +34,13 @@ const Footer = () => {
             <div className="social-links">
               <ul>
                 <li>
-                  <a target="_blank" rel="noreferrer" href="#">
-                    ig
+                  <a target="_blank" rel="noreferrer" href="https://hng.tech/hire">
+                    HNG HIRE
                   </a>
                 </li>
                 <li>
-                  <a target="_blank" rel="noreferrer" href="#">
-                    tw
-                  </a>
-                </li>
-                <li>
-                  <a target="_blank" rel="noreferrer" href="#">
-                    Bē
-                  </a>
-                </li>
-                <li>
-                  <a target="_blank" rel="noreferrer" href="#">
-                    yt
+                  <a target="_blank" rel="noreferrer" href="https://hng.tech/internship">
+                    HNG INTERNSHIP
                   </a>
                 </li>
               </ul>

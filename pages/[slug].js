@@ -1,26 +1,19 @@
-import { documentToReactComponents } from "@contentful/rich-text-react-renderer";
-import { BLOCKS, MARKS } from "@contentful/rich-text-types";
-import { createClient } from "contentful";
-import Head from "next/head";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { tomorrow } from "react-syntax-highlighter/dist/cjs/styles/prism";
-import Skeleton from "../components/Skeleton";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/router';
+import { doc, getDoc, getDocs, collection } from 'firebase/firestore';
+import { db } from '../firebase/config';
+import Skeleton from '../components/Skeleton';
+import Head from 'next/head';
+import { documentToReactComponents } from '@contentful/rich-text-react-renderer';
+import SyntaxHighlighter from 'react-syntax-highlighter';
+import { tomorrow } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 
-const client = createClient({
-  space: process.env.CONTENTFUL_SPACE_ID,
-  accessToken: process.env.CONTENTFUL_ACCESS_KEY,
-});
-
+// Fetch blog paths for static generation
 export const getStaticPaths = async () => {
-  const res = await client.getEntries({
-    content_type: "blog",
-  });
-
-  const paths = res.items.map((item) => {
-    return {
-      params: { slug: item.fields.slug },
-    };
-  });
+  const snapshot = await getDocs(collection(db, 'blogs'));
+  const paths = snapshot.docs.map(doc => ({
+    params: { slug: doc.data().fields.slug }, 
+  }));
 
   return {
     paths,
@@ -28,87 +21,46 @@ export const getStaticPaths = async () => {
   };
 };
 
+// Fetch blog data for a given slug
 export const getStaticProps = async ({ params }) => {
-  const { items } = await client.getEntries({
-    content_type: "blog",
-    "fields.slug": params.slug,
+  const slug = params.slug;
+  const blogsCollection = collection(db, 'blogs');
+  const querySnapshot = await getDocs(blogsCollection);
+  let blog = null;
+
+  querySnapshot.forEach((doc) => {
+    if (doc.data().fields.slug === slug) {
+      blog = { id: doc.id, ...doc.data().fields };
+    }
   });
 
-  if (!items.length) {
+  if (!blog) {
     return {
-      redirect: {
-        destination: "/404",
-        permanent: false,
-      },
+      notFound: true,
     };
   }
 
   return {
-    props: { blog: items[0] },
-    revalidate: 864000,
+    props: { blog },
+    revalidate: 86400, // Revalidate every day
   };
 };
 
-const renderOptions = {
-  renderNode: {
-    [BLOCKS.EMBEDDED_ENTRY]: (node, children) => {
-      if (node.data.target.sys.contentType.sys.id === "videoEmbed") {
-        return (
-          <iframe
-            src={node.data.target.fields.embedUrl}
-            height="100%"
-            width="100%"
-            frameBorder="0"
-            scrolling="no"
-            title={node.data.target.fields.title}
-            allowFullScreen={true}
-          />
-        );
-      }
-    },
 
-    [BLOCKS.EMBEDDED_ASSET]: (node, children) => {
-      // render the EMBEDDED_ASSET as you need
-      return (
-        <img
-          src={`https://${node.data.target.fields.file.url}`}
-          height={node.data.target.fields.file.details.image.height}
-          width={node.data.target.fields.file.details.image.width}
-          alt={node.data.target.fields.description}
-        />
-      );
-    },
-    [BLOCKS.PARAGRAPH]: (node, children) => {
-      // if (
-      //   node.content.length === 1 &&
-      //   node.content[0].marks.find((x) => x.type === "code")
-      // )
-      if (node.content[0].marks.length) {
-        return <pre className="language-html">{children}</pre>;
-      }
-      return <p>{children}</p>;
-    },
-
-    renderMark: {
-      [MARKS.CODE]: (text) => {
-        return (
-          <SyntaxHighlighter
-            language="html"
-            style={tomorrow}
-            showLineNumbers
-            showInlineLineNumbers
-          >
-            {text}
-          </SyntaxHighlighter>
-        );
-      },
-    },
-  },
-};
-
+// Render the blog details page
 const BlogDetails = ({ blog }) => {
-  if (!blog) return <Skeleton />;
-  const { title, date, desc, content, nextBlogLink } = blog.fields;
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (blog) {
+      setLoading(false);
+    }
+  }, [blog]);
+
+  if (loading) return <Skeleton />;
+
+  const { title, date, desc, content, nextBlogLink } = blog;
 
   return (
     <>
@@ -136,7 +88,7 @@ const BlogDetails = ({ blog }) => {
               </div>
               <div className="row">
                 <div className="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
-                  {documentToReactComponents(content, renderOptions)}
+                  {documentToReactComponents(content)}
                 </div>
               </div>
             </div>
@@ -145,7 +97,7 @@ const BlogDetails = ({ blog }) => {
                 <div className="col-lg-8 offset-lg-2 col-md-12">
                   <p>Next Article</p>
                   <h2>
-                    <a>{documentToReactComponents(nextBlogLink)}</a>
+                    <a href={nextBlogLink}>Next Blog</a>
                   </h2>
                 </div>
               </div>

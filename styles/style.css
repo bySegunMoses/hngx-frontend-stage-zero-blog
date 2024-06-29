@@ -1440,3 +1440,14 @@ article.single .next-article a:hover {
     grid-template-columns: 1fr 1fr 1fr;
   }
 }
+
+.card-desc {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4; /* Number of lines to display */
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-height: 6.8em; /* Adjust based on line height (1.7em * 4) */
+  line-height: 1.7em; /* Line height to calculate the max-height */
+  margin-bottom: 1rem;
+}

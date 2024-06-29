@@ -1,18 +1,17 @@
-import { createClient } from "contentful";
+// pages/index.js
+import { db } from '../firebase/config';
+import { collection, getDocs } from "firebase/firestore";
 import Head from "next/head";
 import BlogCard from "../components/BlogCard";
 
 export async function getStaticProps() {
-  const client = createClient({
-    space: process.env.CONTENTFUL_SPACE_ID,
-    accessToken: process.env.CONTENTFUL_ACCESS_KEY,
-  });
-
-  const res = await client.getEntries({ content_type: "blog" });
+  const blogsCollection = collection(db, 'blogs');
+  const blogsSnapshot = await getDocs(blogsCollection);
+  const blogsList = blogsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
   return {
     props: {
-      blogs: res.items,
+      blogs: blogsList,
     },
     revalidate: 1,
   };
@@ -22,7 +21,7 @@ const Blog = ({ blogs }) => {
   return (
     <>
       <Head>
-        <title>Blog | Codegrain</title>
+        <title>Blog | Segun Moses</title>
       </Head>
 
       <main id="journal">
@@ -31,15 +30,15 @@ const Blog = ({ blogs }) => {
             <div className="row">
               <div className="col-lg-8 offset-lg-2 col-md-10 offset-md-1">
                 <div className="page-intro mar-top-lg">
-                  <h1 className="page-title">Blog</h1>
-                  <p>Sharing super ideas in simple, minimal & elegant way.</p>
+                  <h1 className="page-title">Segun Blog</h1>
+                  <p>Shring my ideas, finding in simple, minimal & elegant way..</p>
                 </div>
               </div>
             </div>
             <div className="articles-list mar-top-lg">
               <div className="grids">
                 {blogs.map((blog) => (
-                  <BlogCard key={blog.sys.id} blog={blog} />
+                  <BlogCard key={blog.id} blog={blog} />
                 ))}
               </div>
             </div>

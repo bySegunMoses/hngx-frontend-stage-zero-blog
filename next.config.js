@@ -1,9 +1,18 @@
-module.exports = {
+/** @type {import('next').NextConfig} */
+const nextConfig = {
   images: {
-    domains: ["images.ctfassets.net"],
-  },
-  i18n: {
-    locales: ["en"],
-    defaultLocale: "en",
+    formats: ["image/avif", "image/webp"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "firebasestorage.googleapis.com",
+      },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+      },
+    ],
   },
 };
+
+module.exports = nextConfig;

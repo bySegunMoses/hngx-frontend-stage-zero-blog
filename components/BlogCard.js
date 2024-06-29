@@ -6,12 +6,12 @@ const BlogCard = ({ blog }) => {
 
   return (
     <article>
-      <Link href={"/" + slug}>
+      <Link onClick={console.log(slug)} href={"/" + slug}>
         <a>
           <div className="article-image">
             <div className="icon-arrow"></div>
-            <Image
-              src={"https:" + thumbnail.fields.file.url}
+            <img
+              src={thumbnail.fields.file.url}
               width={thumbnail.fields.file.details.image.width}
               height={thumbnail.fields.file.details.image.height}
               alt={title}
@@ -19,7 +19,7 @@ const BlogCard = ({ blog }) => {
           </div>
           <div className="article-text">
             <h4 className="title">{title}</h4>
-            <p>{desc}</p>
+            <p className="card-desc">{desc}</p>
             <span className="time">{date}</span>
           </div>
         </a>
